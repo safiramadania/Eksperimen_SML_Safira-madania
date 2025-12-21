@@ -1,0 +1,37 @@
+name: Automated Preprocessing Workflow
+
+on:
+  push:
+    branches: [ main ] 
+  workflow_dispatch:   
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Preprocessing Script
+        run: |
+          python preprocessing/automate_safira_madania.py
+
+      - name: Commit and Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Menambahkan folder hasil preprocessing
+          git add preprocessing/phishing_preprocessing/
+          
+          # Cek jika ada perubahan, baru lakukan commit
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update processed dataset [automated]" && git push)
