@@ -104,9 +104,16 @@ if __name__ == "__main__":
         save_path=os.path.join(output_folder, 'preprocessor.joblib')
     )
 
-    # Simpan hasil dalam bentuk CSV untuk membuktikan Action berhasil
+    # Simpan hasil X (sudah ada di kode kamu)
     pd.DataFrame(X_train).to_csv(os.path.join(output_folder, 'X_train_processed.csv'), index=False)
     pd.DataFrame(X_val).to_csv(os.path.join(output_folder, 'X_val_processed.csv'), index=False)
     pd.DataFrame(X_test).to_csv(os.path.join(output_folder, 'X_test_processed.csv'), index=False)
+
+    # TAMBAHKAN BARIS INI: Simpan hasil y (label)
+    pd.DataFrame(y_train).to_csv(os.path.join(output_folder, 'y_train.csv'), index=False)
+    pd.DataFrame(y_val).to_csv(os.path.join(output_folder, 'y_val.csv'), index=False)
+    pd.DataFrame(y_test).to_csv(os.path.join(output_folder, 'y_test.csv'), index=False)
+    
+    print("Semua file X dan y berhasil disimpan!")
     print("Preprocessing via GitHub Actions Berhasil!")
 
