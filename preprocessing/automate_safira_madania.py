@@ -48,19 +48,20 @@ def automate_preprocessing(df, target_column, save_path='preprocessor.joblib'):
 
     df_final = df.drop(columns=final_drop)
 
+    # 4. Identifikasi Binary & Numerik
+    kolom_binary = [c for c in X.columns if X[c].nunique() <= 2]
+    kolom_numerik = [c for c in X.columns if X[c].nunique() > 2]
+
     X = df_final.drop(target_column, axis=1)
     y = df_final[target_column].replace(-1, 0)
 
     # Simpan daftar kolom akhir ke variabel
     list_kolom_final = X.columns.tolist()
 
-    # 4. Split Data
-    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
-    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
-
-    # 5. Identifikasi Binary & Numerik
-    kolom_binary = [c for c in X.columns if X[c].nunique() <= 2]
-    kolom_numerik = [c for c in X.columns if X[c].nunique() > 2]
+    # 5. Split Data
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42, stratify=y
+    )
 
     # 6. Transformasi
     transformer = ColumnTransformer([
@@ -69,7 +70,6 @@ def automate_preprocessing(df, target_column, save_path='preprocessor.joblib'):
     ])
 
     X_train_p = transformer.fit_transform(X_train)
-    X_val_p   = transformer.transform(X_val)
     X_test_p  = transformer.transform(X_test)
 
     # 7. SIMPAN SEMUA DALAM SATU FILE
@@ -83,7 +83,7 @@ def automate_preprocessing(df, target_column, save_path='preprocessor.joblib'):
     print(f"Fitur dibuang   : {len(final_drop)} kolom")
     print(f"File disimpan ke: {save_path}")
 
-    return X_train_p, X_val_p, X_test_p, y_train, y_val, y_test
+    return X_train_p, X_test_p, y_train, y_test
 
 if __name__ == "__main__":
 
@@ -97,22 +97,18 @@ if __name__ == "__main__":
     # Load data
     df = load_arff_data(raw_path)
 
-    # Jalankan preprocessing
-    X_train, X_val, X_test, y_train, y_val, y_test = automate_preprocessing(
+    X_train, X_test, y_train, y_test = automate_preprocessing(
         df,
         target_column='CLASS_LABEL',
         save_path=os.path.join(output_folder, 'preprocessor.joblib')
     )
 
-    # Simpan hasil X (sudah ada di kode kamu)
     pd.DataFrame(X_train).to_csv(os.path.join(output_folder, 'X_train_processed.csv'), index=False)
-    pd.DataFrame(X_val).to_csv(os.path.join(output_folder, 'X_val_processed.csv'), index=False)
     pd.DataFrame(X_test).to_csv(os.path.join(output_folder, 'X_test_processed.csv'), index=False)
 
-    # TAMBAHKAN BARIS INI: Simpan hasil y (label)
     pd.DataFrame(y_train).to_csv(os.path.join(output_folder, 'y_train.csv'), index=False)
-    pd.DataFrame(y_val).to_csv(os.path.join(output_folder, 'y_val.csv'), index=False)
     pd.DataFrame(y_test).to_csv(os.path.join(output_folder, 'y_test.csv'), index=False)
+
     
     print("Semua file X dan y berhasil disimpan!")
     print("Preprocessing via GitHub Actions Berhasil!")

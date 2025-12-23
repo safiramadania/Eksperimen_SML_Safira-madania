@@ -33,5 +33,5 @@ jobs:
           # Menambahkan folder hasil preprocessing
           git add preprocessing/phishing_preprocessing/
           
-          # Cek jika ada perubahan, baru lakukan commit
+          # commit
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update processed dataset [automated]" && git push)
