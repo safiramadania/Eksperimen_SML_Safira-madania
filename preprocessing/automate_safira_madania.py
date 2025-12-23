@@ -41,8 +41,18 @@ def automate_preprocessing(df, target_column, save_path='preprocessor.joblib'):
     df_final = df.drop(columns=final_drop)
 
     # 4. Identifikasi Binary & Numerik
-    kolom_binary = [c for c in X.columns if X[c].nunique() <= 2]
-    kolom_numerik = [c for c in X.columns if X[c].nunique() > 2]
+    kolom_binary = []
+    kolom_numerik = []
+
+    for col in df_final.columns:
+        if col == target_column:
+            continue
+
+        jumlah_unik = df_final[col].nunique()
+        if jumlah_unik <= 2:
+            kolom_binary.append(col)
+        else:
+            kolom_numerik.append(col)
 
     X = df_final.drop(target_column, axis=1)
     y = df_final[target_column].replace(-1, 0)
